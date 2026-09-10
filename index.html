@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 輔助文獻回顧作業單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Lora:wght@400;500;600&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --color-bg:#faf8f4;
+    --color-text:#201f1d;
+    --color-accent:#b68235;
+    --color-accent-100:#f6ecdb;
+    --color-accent-600:#a0722c;
+    --color-accent-700:#87611f;
+    --color-neutral-200:#e6e1d8;
+    --color-neutral-300:#d3cdc2;
+    --color-neutral-400:#aaa49a;
+    --color-neutral-600:#6f695f;
+    --color-neutral-700:#544f47;
+    --color-divider:#ded8cd;
+  }
+  body{margin:0;background:var(--color-bg)}
+  [data-k]::placeholder{color:var(--color-neutral-400);font-style:italic}
+  [data-k]:focus-visible{outline:2px solid var(--color-accent);outline-offset:1px}
+  a{color:var(--color-accent-700)}
+  a:hover{color:var(--color-accent-600)}
+  button:hover{border-color:var(--color-accent) !important;background:var(--color-accent-100) !important}
+  @media print{
+    body{background:#fff}
+    #toolbar{display:none !important}
+    textarea,input,select{
+      border-color:#bbb !important;
+      color:#000 !important;
+      overflow:hidden !important;
+    }
+    #root{max-width:none;padding:0}
+    table{page-break-inside:auto}
+    tr{page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div id="root" style="font-family:'Lora','Noto Serif TC',serif;color:var(--color-text);font-size:14px;line-height:1.7;max-width:1000px;margin:0 auto;padding:28px 20px 80px;box-sizing:border-box">
+
+  <div id="toolbar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--color-text);padding-bottom:10px">
+    <span style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--color-accent-700)">Worksheet　線上填寫版</span>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <span style="font-size:11px;color:var(--color-neutral-600);min-width:8em"><span id="saveStatus"></span></span>
+      <button onclick="onExport()" style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:12px;padding:6px 12px;border:1px solid var(--color-accent);border-radius:4px;background:transparent;color:var(--color-accent-700);cursor:pointer">匯出備份</button>
+      <button onclick="onImport()" style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:12px;padding:6px 12px;border:1px solid var(--color-neutral-400);border-radius:4px;background:transparent;color:var(--color-neutral-700);cursor:pointer">匯入備份</button>
+      <button onclick="onPrint()" style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:12px;padding:6px 12px;border:1px solid var(--color-neutral-400);border-radius:4px;background:transparent;color:var(--color-neutral-700);cursor:pointer">列印／PDF</button>
+      <button onclick="onClear()" style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:12px;padding:6px 12px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--color-neutral-600);cursor:pointer">清空</button>
+    </div>
+  </div>
+
+  <h1 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:400;font-size:clamp(26px,4vw,36px);line-height:1.25;margin:22px 0 6px">AI 輔助文獻回顧：從檢索策略到人機判讀</h1>
+  <p style="margin:0 0 6px;color:var(--color-neutral-700);max-width:46em;text-wrap:pretty">本作業單引導你完成一次完整的 AI 輔助文獻回顧：自行擬定檢索策略、以 AI 進行分群與摘整、再以學者的專業直覺與資料庫原始紀錄回頭檢驗 AI 的判讀。<strong style="font-weight:600">第三、四部分為本次作業核心</strong>，配分與篇幅重於前兩部分。</p>
+  <p style="margin:0 0 20px;font-size:11.5px;color:var(--color-neutral-600)">所填內容會自動儲存在你這台電腦的瀏覽器中（不會上傳）；換電腦或清理瀏覽器資料前，請先「匯出備份」。</p>
+
+  <table style="width:100%;border-collapse:collapse;margin:0 0 10px;font-size:13px">
+    <tbody>
+      <tr>
+        <td style="width:16%;padding:8px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-size:12px">姓名</td>
+        <td style="width:34%;padding:4px 6px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><input data-k="name" placeholder="" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:4px 2px;box-sizing:border-box"></td>
+        <td style="width:16%;padding:8px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-size:12px">系級／學號</td>
+        <td style="width:34%;padding:4px 6px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><input data-k="sid" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:4px 2px;box-sizing:border-box"></td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-size:12px">使用之 AI 工具</td>
+        <td style="padding:4px 6px;border-bottom:1px solid var(--color-divider)"><input data-k="tool" placeholder="工具名稱與版本" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:4px 2px;box-sizing:border-box"></td>
+        <td style="padding:8px 0;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-size:12px">完成日期</td>
+        <td style="padding:4px 6px;border-bottom:1px solid var(--color-divider)"><input data-k="date" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:4px 2px;box-sizing:border-box"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="display:flex;align-items:baseline;gap:14px;margin:34px 0 4px">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1;color:var(--color-accent)">I</span>
+    <h2 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:500;font-size:22px;margin:0">研究主題與檢索策略</h2>
+  </div>
+  <div style="border-top:1px solid var(--color-text);margin-bottom:18px"></div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 3px">1.1　研究主題陳述</h3>
+  <p style="margin:0 0 8px;font-size:11.5px;color:var(--color-neutral-600)">請以 3–5 句說明研究問題、對象範圍與為何值得探究。</p>
+  <textarea data-k="topic" rows="4" placeholder="在此輸入……" style="width:100%;box-sizing:border-box;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;color:inherit;line-height:1.8;padding:12px 14px;resize:vertical;margin-bottom:24px"></textarea>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 8px">1.2　五個關鍵詞與檢索字串</h3>
+  <div style="overflow-x:auto;margin-bottom:16px">
+  <table style="width:100%;min-width:620px;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:7%">#</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:29%">關鍵詞（中文）</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:32%">對應英文詞／同義詞</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:32%">選用理由</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">1</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw1a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw1b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw1c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">2</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw2a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw2b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw2c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">3</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw3a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw3b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw3c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">4</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw4a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw4b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw4c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">5</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw5a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw5b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="kw5c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <p style="margin:0 0 6px;font-size:11.5px;color:var(--color-neutral-600)">完整檢索字串（請保留 AND／OR／NOT、括號、截字符號與欄位限定，例如 TI= 或 AB=）：</p>
+  <textarea data-k="query" rows="3" style="width:100%;box-sizing:border-box;border:1px solid var(--color-divider);border-left:2px solid var(--color-accent);border-radius:4px;background:transparent;font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:14px;color:inherit;line-height:1.8;padding:12px 14px;resize:vertical;margin-bottom:24px"></textarea>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 8px">1.3　使用之資料庫與檢索紀錄</h3>
+  <div style="overflow-x:auto;margin-bottom:24px">
+  <table style="width:100%;min-width:620px;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:32%">資料庫名稱</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:18%">檢索日期</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:16%">命中筆數</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:34%">篩選條件（年限／語言／文獻類型）</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db1a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db1b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db1c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db1d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db2a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db2b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db2c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db2d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db3a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db3b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db3c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="db3d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 3px">1.4　三十筆文獻概況清單</h3>
+  <p style="margin:0 0 8px;font-size:11.5px;color:var(--color-neutral-600)">研究方法欄請填具體類型：量化調查、實驗、個案研究、民族誌、內容分析、系統性回顧、混合研究等。</p>
+  <div style="overflow-x:auto;margin-bottom:8px">
+  <table style="width:100%;min-width:680px;border-collapse:collapse;font-size:12.5px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:5%">#</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:20%">作者</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:9%">年份</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:44%">篇名</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:22%">研究方法</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">1</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit1a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit1b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit1c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit1d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">2</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit2a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit2b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit2c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit2d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">3</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit3a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit3b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit3c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit3d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">4</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit4a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit4b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit4c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit4d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">5</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit5a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit5b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit5c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit5d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">6</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit6a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit6b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit6c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit6d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">7</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit7a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit7b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit7c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit7d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">8</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit8a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit8b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit8c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit8d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">9</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit9a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit9b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit9c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit9d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">10</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit10a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit10b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit10c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit10d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">11</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit11a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit11b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit11c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit11d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">12</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit12a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit12b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit12c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit12d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">13</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit13a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit13b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit13c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit13d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">14</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit14a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit14b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit14c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit14d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">15</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit15a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit15b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit15c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit15d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">16</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit16a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit16b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit16c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit16d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">17</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit17a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit17b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit17c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit17d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">18</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit18a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit18b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit18c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit18d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">19</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit19a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit19b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit19c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit19d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">20</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit20a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit20b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit20c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit20d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">21</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit21a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit21b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit21c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit21d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">22</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit22a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit22b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit22c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit22d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">23</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit23a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit23b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit23c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit23d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">24</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit24a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit24b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit24c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit24d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">25</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit25a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit25b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit25c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit25d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">26</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit26a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit26b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit26c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit26d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">27</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit27a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit27b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit27c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit27d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">28</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit28a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit28b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit28c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit28d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">29</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit29a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit29b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit29c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit29d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum'">30</td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit30a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit30b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit30c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+          <td style="padding:1px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="lit30d" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:5px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+  <p style="margin:0 0 8px;font-size:11px;color:var(--color-neutral-600)">已填 <span id="litFilled">0</span> ／ 30 筆</p>
+
+  <div style="display:flex;align-items:baseline;gap:14px;margin:38px 0 4px">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1;color:var(--color-accent)">II</span>
+    <h2 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:500;font-size:22px;margin:0">AI 分群結果與精選十筆文獻</h2>
+  </div>
+  <div style="border-top:1px solid var(--color-text);margin-bottom:18px"></div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 3px">2.1　AI 提出的分群架構</h3>
+  <p style="margin:0 0 8px;font-size:11.5px;color:var(--color-neutral-600)">列出 AI 所產生的群組名稱、群內筆數，以及 AI 自述的分群依據（依主題？依方法？依理論取徑？）。</p>
+  <div style="overflow-x:auto;margin-bottom:24px">
+  <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:8%">群組</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:26%">AI 命名</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:10%">筆數</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:56%">AI 自述之分群依據</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);font-family:'Cormorant Garamond',serif;font-size:15px">A</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl0a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl0b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl0c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);font-family:'Cormorant Garamond',serif;font-size:15px">B</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl1a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl1b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl1c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);font-family:'Cormorant Garamond',serif;font-size:15px">C</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl2a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl2b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl2c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px 8px;border-bottom:1px solid var(--color-divider);font-family:'Cormorant Garamond',serif;font-size:15px">D</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl3a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl3b" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><input data-k="cl3c" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:8px 4px;box-sizing:border-box"></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 8px">2.2　精選十筆文獻綜合整理表</h3>
+  <div style="overflow-x:auto;margin-bottom:24px">
+  <table style="width:100%;min-width:760px;border-collapse:collapse;font-size:12.5px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:5%">#</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:19%">作者（年份）</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:14%">主題群組</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:36%">核心發現</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:26%">方法論（設計／樣本／分析）</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">1</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel1a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel1b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel1c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel1d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">2</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel2a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel2b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel2c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel2d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">3</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel3a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel3b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel3c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel3d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">4</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel4a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel4b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel4c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel4d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">5</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel5a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel5b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel5c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel5d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">6</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel6a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel6b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel6c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel6d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">7</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel7a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel7b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel7c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel7d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">8</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel8a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel8b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel8c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel8d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">9</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel9a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel9b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel9c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel9d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">10</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel10a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel10b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel10c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="sel10d" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;margin:38px 0 4px">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1;color:var(--color-accent)">III</span>
+    <div>
+      <h2 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:500;font-size:22px;margin:0">人機判讀批判對照</h2>
+      <span style="font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent-700)">核心章節</span>
+    </div>
+  </div>
+  <div style="border-top:2px solid var(--color-accent);margin-bottom:18px"></div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 3px">3.1　AI 分群邏輯與人類學者直覺的差異</h3>
+  <p style="margin:0 0 8px;font-size:11.5px;color:var(--color-neutral-600)">同一組文獻，若由你依領域知識重新分群，會怎麼分？兩者差在哪一層？（表面語彙 vs. 理論預設、方法親近性、學派脈絡、時序演進……）</p>
+  <div style="overflow-x:auto;margin-bottom:28px">
+  <table style="width:100%;min-width:680px;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:20%">比較面向</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:40%">AI 的判讀邏輯</th>
+        <th style="text-align:left;padding:6px 8px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.12em;width:40%">你（人類研究者）的判讀</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top;font-size:12.5px">分群的切分依據</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp0a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp0b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top;font-size:12.5px">對理論脈絡的敏感度</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp1a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp1b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top;font-size:12.5px">對方法論差異的處理</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp2a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp2b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top;font-size:12.5px">邊緣／跨界文獻的歸屬</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp3a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp3b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top;font-size:12.5px">研究缺口的辨識</td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp4a" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 4px;border-bottom:1px solid var(--color-divider)"><textarea data-k="cmp4b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.7;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 12px">3.2　具體案例說明</h3>
+
+  <div style="border:1px solid var(--color-divider);border-radius:4px;padding:16px 18px;margin-bottom:14px">
+    <div style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:14.5px">案例一　AI 漏掉了什麼？</div>
+    <p style="margin:2px 0 8px;font-size:11.5px;color:var(--color-neutral-600)">指出一篇被 AI 忽略或低估的關鍵文獻／概念，說明它為何重要、AI 為何會漏。</p>
+    <textarea data-k="case1" rows="5" style="width:100%;box-sizing:border-box;border:0;border-top:1px solid var(--color-neutral-200);background:transparent;font:inherit;color:inherit;line-height:1.85;padding:10px 0 0;resize:vertical"></textarea>
+  </div>
+
+  <div style="border:1px solid var(--color-divider);border-radius:4px;padding:16px 18px;margin-bottom:14px">
+    <div style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:14.5px">案例二　哪裡產生了分類誤判？</div>
+    <p style="margin:2px 0 8px;font-size:11.5px;color:var(--color-neutral-600)">舉出一筆被歸錯群的文獻：AI 歸入何群、應歸何群、誤判的可能成因（詞彙表面相似、摘要偏誤、方法名稱誤讀……）。</p>
+    <textarea data-k="case2" rows="5" style="width:100%;box-sizing:border-box;border:0;border-top:1px solid var(--color-neutral-200);background:transparent;font:inherit;color:inherit;line-height:1.85;padding:10px 0 0;resize:vertical"></textarea>
+  </div>
+
+  <div style="border:1px solid var(--color-divider);border-left:2px solid var(--color-accent);border-radius:4px;padding:16px 18px;margin-bottom:8px">
+    <div style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:14.5px">綜合判斷</div>
+    <p style="margin:2px 0 8px;font-size:11.5px;color:var(--color-neutral-600)">在你的研究主題中，AI 分群可信任到什麼程度？哪些判斷必須保留給人？</p>
+    <textarea data-k="synth" rows="4" style="width:100%;box-sizing:border-box;border:0;border-top:1px solid var(--color-neutral-200);background:transparent;font:inherit;color:inherit;line-height:1.85;padding:10px 0 0;resize:vertical"></textarea>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;margin:38px 0 4px">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1;color:var(--color-accent)">IV</span>
+    <div>
+      <h2 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:500;font-size:22px;margin:0">文獻真實性查證報告</h2>
+      <span style="font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent-700)">核心章節</span>
+    </div>
+  </div>
+  <div style="border-top:2px solid var(--color-accent);margin-bottom:18px"></div>
+
+  <p style="margin:0 0 16px;font-size:11.5px;color:var(--color-neutral-600);max-width:46em;text-wrap:pretty">自精選十筆中任選 3 筆，逐欄比對 AI 輸出與資料庫原始紀錄。判定請選：<strong style="font-weight:600">相符</strong>／<strong style="font-weight:600">微偏</strong>（頁碼、卷期、年份、作者順序等細節有誤）／<strong style="font-weight:600">幻覺</strong>（該文獻或該內容不存在）。</p>
+
+  
+    <div style="border:1px solid var(--color-divider);border-radius:4px;padding:14px 16px;margin-bottom:16px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--color-accent)">1</span>
+        <input data-k="v1cite" placeholder="文獻簡稱（作者, 年份）" style="flex:1;border:0;border-bottom:1px solid var(--color-neutral-200);background:transparent;font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:14px;color:inherit;padding:4px 2px;box-sizing:border-box">
+      </div>
+      <div style="overflow-x:auto">
+      <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12.5px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:18%">查核欄位</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:31%">AI 輸出內容</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:35%">資料庫真實紀錄／DOI</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:16%">判定</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">作者／年份</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r0ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r0db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v1r0vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">篇名</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r1ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r1db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v1r1vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">期刊／卷期／頁碼</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r2ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r2db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v1r2vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">核心發現敘述</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r3ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v1r3db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v1r3vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+        </tbody>
+      </table>
+      </div>
+    </div>
+  
+    <div style="border:1px solid var(--color-divider);border-radius:4px;padding:14px 16px;margin-bottom:16px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--color-accent)">2</span>
+        <input data-k="v2cite" placeholder="文獻簡稱（作者, 年份）" style="flex:1;border:0;border-bottom:1px solid var(--color-neutral-200);background:transparent;font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:14px;color:inherit;padding:4px 2px;box-sizing:border-box">
+      </div>
+      <div style="overflow-x:auto">
+      <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12.5px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:18%">查核欄位</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:31%">AI 輸出內容</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:35%">資料庫真實紀錄／DOI</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:16%">判定</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">作者／年份</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r0ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r0db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v2r0vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">篇名</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r1ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r1db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v2r1vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">期刊／卷期／頁碼</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r2ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r2db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v2r2vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">核心發現敘述</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r3ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v2r3db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v2r3vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+        </tbody>
+      </table>
+      </div>
+    </div>
+  
+    <div style="border:1px solid var(--color-divider);border-radius:4px;padding:14px 16px;margin-bottom:16px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--color-accent)">3</span>
+        <input data-k="v3cite" placeholder="文獻簡稱（作者, 年份）" style="flex:1;border:0;border-bottom:1px solid var(--color-neutral-200);background:transparent;font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:14px;color:inherit;padding:4px 2px;box-sizing:border-box">
+      </div>
+      <div style="overflow-x:auto">
+      <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12.5px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:18%">查核欄位</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:31%">AI 輸出內容</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:35%">資料庫真實紀錄／DOI</th>
+            <th style="text-align:left;padding:5px 6px;border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:10.5px;letter-spacing:0.1em;width:16%">判定</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">作者／年份</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r0ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r0db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v3r0vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">篇名</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r1ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r1db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v3r1vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">期刊／卷期／頁碼</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r2ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r2db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v3r2vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+            <tr>
+              <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-700);vertical-align:top">核心發現敘述</td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r3ai" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="v3r3db" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:5px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+              <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)">
+                <select data-k="v3r3vd" style="width:100%;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;font-size:12px;color:inherit;padding:5px 4px;box-sizing:border-box">
+                  <option value="">—</option>
+                  <option value="相符">相符</option>
+                  <option value="微偏">微偏</option>
+                  <option value="幻覺">幻覺</option>
+                </select>
+              </td>
+            </tr>
+          
+        </tbody>
+      </table>
+      </div>
+    </div>
+  
+
+  <div style="border:1px solid var(--color-divider);border-radius:4px;padding:16px 18px;margin-top:8px">
+    <div style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:14.5px">查核結論與心得</div>
+    <p style="margin:2px 0 8px;font-size:11.5px;color:var(--color-neutral-600)">是否發現文獻幻覺或資訊微偏？若有，錯在哪一類欄位？這對「可直接引用 AI 摘要」的假設有何影響？</p>
+    <textarea data-k="vconc" rows="6" style="width:100%;box-sizing:border-box;border:0;border-top:1px solid var(--color-neutral-200);background:transparent;font:inherit;color:inherit;line-height:1.85;padding:10px 0 0;resize:vertical"></textarea>
+  </div>
+
+  <div style="display:flex;align-items:baseline;gap:14px;margin:38px 0 4px">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:30px;line-height:1;color:var(--color-accent)">V</span>
+    <h2 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:500;font-size:22px;margin:0">AI 互動日誌與學習反思</h2>
+  </div>
+  <div style="border-top:1px solid var(--color-text);margin-bottom:18px"></div>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 8px">5.1　主要 Prompts 紀錄</h3>
+  <div style="overflow-x:auto;margin-bottom:20px">
+  <table style="width:100%;min-width:720px;border-collapse:collapse;font-size:12.5px">
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:5%">#</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:15%">目的</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:44%">Prompt 原文（節錄）</th>
+        <th style="text-align:left;padding:6px 6px;border-top:1px solid var(--color-text);border-bottom:1px solid var(--color-text);font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:11px;letter-spacing:0.1em;width:36%">產出評價與後續修正</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">1</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="pr1a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr1b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr1c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">2</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="pr2a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr2b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr2c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">3</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="pr3a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr3b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr3c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">4</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="pr4a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr4b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr4c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+        <tr>
+          <td style="padding:6px;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-feature-settings:'tnum';vertical-align:top">5</td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><input data-k="pr5a" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 4px;box-sizing:border-box"></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr5b" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+          <td style="padding:2px 3px;border-bottom:1px solid var(--color-divider)"><textarea data-k="pr5c" rows="2" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;line-height:1.6;padding:6px 4px;box-sizing:border-box;resize:vertical;overflow:hidden"></textarea></td>
+        </tr>
+      
+    </tbody>
+  </table>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:26px">
+    <tbody>
+      <tr>
+        <td style="width:26%;padding:8px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-size:12px">AI 對話連結</td>
+        <td style="padding:4px 6px;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)"><input data-k="ailink" placeholder="https://" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 2px;box-sizing:border-box"></td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;border-bottom:1px solid var(--color-divider);color:var(--color-neutral-600);font-size:12px">截圖檔名／附件編號</td>
+        <td style="padding:4px 6px;border-bottom:1px solid var(--color-divider)"><input data-k="shots" style="width:100%;border:0;background:transparent;font:inherit;color:inherit;padding:6px 2px;box-sizing:border-box"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-family:'Cormorant Garamond','Noto Serif TC',serif;font-weight:600;font-size:16px;margin:0 0 3px">5.2　簡短心得</h3>
+  <p style="margin:0 0 8px;font-size:11.5px;color:var(--color-neutral-600)">200–400 字：這次實作如何改變你未來在研究中使用 AI 的策略？請具體說明「什麼交給 AI、什麼一定自己做、如何驗證」。</p>
+  <textarea data-k="reflect" rows="10" style="width:100%;box-sizing:border-box;border:1px solid var(--color-divider);border-radius:4px;background:transparent;font:inherit;color:inherit;line-height:1.9;padding:14px 16px;resize:vertical"></textarea>
+  <p style="margin:6px 0 0;font-size:11px;color:var(--color-neutral-600);text-align:right">目前 <span id="reflectCount">0</span> 字</p>
+
+  <div style="margin-top:30px;padding-top:10px;border-top:1px solid var(--color-text);display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-size:10.5px;color:var(--color-neutral-600)">
+    <span><span id="savedNote">內容會自動儲存在本機瀏覽器</span></span>
+    <span style="font-family:'Cormorant Garamond',serif;letter-spacing:0.14em">END OF WORKSHEET</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var KEY = 'worksheet:ai-litreview:v1';
+  var data = {}, savedAt = '', timer = null, flash = null;
+  var root = document.getElementById('root');
+
+  function $(id){ return document.getElementById(id); }
+  function controls(){ return Array.prototype.slice.call(root.querySelectorAll('[data-k]')); }
+
+  function autosize(el){
+    if (el.tagName === 'TEXTAREA'){
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+  }
+
+  function recount(){
+    var lit = 0, i, s;
+    for (i = 1; i <= 30; i++){
+      if (['a','b','c','d'].some(function(k){ return (data['lit'+i+k]||'').trim(); })) lit++;
+    }
+    s = (data.reflect || '').replace(/\s/g,'').length;
+    $('litFilled').textContent = lit;
+    $('reflectCount').textContent = s;
+  }
+
+  function apply(){
+    controls().forEach(function(el){
+      var v = data[el.dataset.k];
+      if (v != null && el.value !== v) el.value = v;
+      autosize(el);
+    });
+    recount();
+  }
+
+  var canStore = (function(){
+    try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }
+    catch(e){ return false; }
+  })();
+
+  function save(){
+    if (!canStore){
+      $('saveStatus').textContent = '此瀏覽器未開放自動儲存';
+      $('savedNote').textContent = '此瀏覽器未開放自動儲存，請在關閉前按「匯出備份」保留檔案';
+      return;
+    }
+    var stamp = new Date().toLocaleString('zh-TW', {hour12:false});
+    try{
+      localStorage.setItem(KEY, JSON.stringify({fields:data, savedAt:stamp}));
+      savedAt = stamp;
+      $('saveStatus').textContent = '已儲存 ✓';
+      $('savedNote').textContent = '最後儲存於 ' + stamp + '（存於本機瀏覽器）';
+      clearTimeout(flash);
+      flash = setTimeout(function(){ $('saveStatus').textContent = ''; }, 2500);
+    }catch(e){
+      $('saveStatus').textContent = '儲存失敗（空間不足），請按「匯出備份」';
+    }
+  }
+
+  function onEdit(e){
+    var el = e.target;
+    if (!el || !el.dataset || !el.dataset.k) return;
+    data[el.dataset.k] = el.value;
+    autosize(el);
+    recount();
+    $('saveStatus').textContent = '編輯中…';
+    clearTimeout(timer);
+    timer = setTimeout(save, 500);
+  }
+
+  window.onExport = function(){
+    var blob = new Blob([JSON.stringify({fields:data, savedAt:savedAt}, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = ((data.name || '作業單').trim()) + '_文獻回顧作業單.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  };
+
+  window.onImport = function(){
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = function(){
+      var f = input.files && input.files[0];
+      if (!f) return;
+      var r = new FileReader();
+      r.onload = function(){
+        try{
+          var parsed = JSON.parse(r.result);
+          data = parsed.fields || parsed || {};
+          apply();
+          save();
+        }catch(e){
+          $('saveStatus').textContent = '匯入失敗：檔案格式不符';
+        }
+      };
+      r.readAsText(f);
+    };
+    input.click();
+  };
+
+  window.onClear = function(){
+    if (!window.confirm('確定清空所有已填內容？建議先「匯出備份」。')) return;
+    data = {};
+    controls().forEach(function(el){ el.value = ''; autosize(el); });
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    savedAt = '';
+    $('saveStatus').textContent = '已清空';
+    $('savedNote').textContent = '內容會自動儲存在本機瀏覽器';
+    recount();
+  };
+
+  window.onPrint = function(){
+    controls().forEach(autosize);
+    window.print();
+  };
+
+  window.addEventListener('beforeprint', function(){ controls().forEach(autosize); });
+
+  window.addEventListener('beforeunload', function(e){
+    if (!canStore && Object.keys(data).length){
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  try{
+    var raw = localStorage.getItem(KEY);
+    if (raw){
+      var parsed = JSON.parse(raw);
+      data = parsed.fields || {};
+      savedAt = parsed.savedAt || '';
+      if (savedAt) $('savedNote').textContent = '最後儲存於 ' + savedAt + '（存於本機瀏覽器）';
+    }
+  }catch(e){ data = {}; }
+
+  root.addEventListener('input', onEdit);
+  root.addEventListener('change', onEdit);
+  apply();
+  [60, 300, 900].forEach(function(t){ setTimeout(apply, t); });
+})();
+</script>
+</body>
+</html>
